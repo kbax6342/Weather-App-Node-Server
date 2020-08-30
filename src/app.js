@@ -9,7 +9,7 @@ const app = express()
 //Define paths for express config
 const publicDirectoryPath = path.join(__dirname, '../public')
 const viewsPath = path.join(__dirname, '../templates/views')
-const partialPath = path.join(___dirname, ',,/templates/partials')
+const partialPath = path.join(__dirname, '../templates/partials')
 
 //Configuration
 //This is a line of code connecting handle bars to express
@@ -23,6 +23,7 @@ hbs.registerPartials(partialPath)
 
 //This is the line of code that is connecting the express.ls which is a framework for node.js
 app.use(express.static(publicDirectoryPath))
+app.use(express.static('views/images'))
 
 
 app.get('/weather', (req, res) => {
@@ -41,15 +42,30 @@ app.get('', (req, res) => {
 
 app.get('/about', (req, res) => {
     res.render('about', {
-        title: 'About',
-        name: 'Kevin Baxter'
+        title: 'About Me',
+        name: 'Kevin Baxter',
+        picture: 'web-server/templates/views/images/profie-pic2.png'
     })
 })
 
 app.get('/help', (req, res) => {
     res.render('help', {
-        title: 'This is the help page'
+        title: 'Help',
+        name: 'Kevin Baxter'
 
+    })
+})
+app.get('/help/*', (req, res) => {
+    res.render('404', {
+        title: '404 page',
+        pageText: 'Help article not found'
+    })
+})
+
+app.get('*', (req, res) => {
+    res.render('404', {
+        title: '404',
+        pageText: 'Page not found'
     })
 })
 
