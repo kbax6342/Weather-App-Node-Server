@@ -1,6 +1,8 @@
 const express = require('express')
 const path = require('path')
 const hbs = require('hbs')
+const geocode = require('./utils/geocode')
+const forecast = require('./utils/forecast')
 
 //app is the application being initiliazed
 const app = express()
@@ -27,11 +29,40 @@ app.use(express.static('views/images'))
 
 
 app.get('/weather', (req, res) => {
-    res.send({
-        forecast: 'It is snowing',
-        location: 'Philadelphia'
+
+    if (!req.query.address) {
+        return res.send({
+            error: "You must enter address"
+        })
+    }
+
+    geocode(req.query.address, (error, {
+        latitude,
+        longitude,
+        location
+    }) => {
+        if (error) {
+            return res.send({
+                error
+            })
+        }
+
+        forecast(latitude, longitude, (error, forecastData) => {
+            if (error) {
+                return res.send({
+                    error
+                })
+            }
+            res.send({
+                forecast: forecastData,
+                location,
+                address: req.query.address
+            })
+        })
     })
 })
+
+
 
 app.get('', (req, res) => {
     res.render('index', {
@@ -55,6 +86,21 @@ app.get('/help', (req, res) => {
 
     })
 })
+
+app.get('/products', (req, res) => {
+    if (!req.query.search) {
+        return res.send({
+            error: "You must provide a search term"
+        })
+    }
+
+    console.log(req.query.search)
+    res.send({
+        products: {}
+    })
+
+})
+
 app.get('/help/*', (req, res) => {
     res.render('404', {
         title: '404 page',
